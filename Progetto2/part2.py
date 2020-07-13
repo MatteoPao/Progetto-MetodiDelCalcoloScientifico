@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 
 from imageProcessing import compress_matrix
 
+#Queste righe generano la finestra che conterrà l'interfaccia
 root = Tk()
 root.title("Simple BMP Compresser")
 root.geometry('480x300')
@@ -12,17 +13,25 @@ root.geometry('480x300')
 startingImage = None
 imgArr = None
 
+'''
+OPEN_FILE
+Quesa funzione viene chiamata alla pressione del bottone Import file
+'''
 def openFile():
     global startingImage
     global my_img
     global imgArr
 
+    #Apro la finestra del filesystem per la selezione di un file bmp
     filepath = filedialog.askopenfilename(
         initialdir = "\\TestImage", 
         filetypes = (("Bitmap File","*.bmp"),))
+
+    #Salvo l'immagine e la converto in array
     startingImage = Image.open(filepath)
     imgArr = (np.array(startingImage))
 
+    #Imposto l'immagine importata come thumbnail
     thumb = startingImage.copy()
     thumb.thumbnail((150, 150))
     my_img = ImageTk.PhotoImage(thumb)
@@ -33,19 +42,29 @@ def openFile():
     
     entry1.config(state='normal')
     info_label1.config(text = '(1, ' + str(min(imgArr.shape)) +')')
+    #chiamo enableStart per verificare se sussistono le condizioni per la compressione
     enableStart()
 
-
+'''
+EDIT_IMAGE
+'''
 def editImage():
+    #leggo i valori F e d
     f = int(var1.get())
     d = int(var2.get())
 
+    #Comprimo, modifico e decomprimo l'immagine
     resArr = compress_matrix(imgArr.copy(), f, d)
     resImage = Image.fromarray(resArr)
 
+    #Mostro i risultati
     startingImage.show()
     resImage.show()
 
+'''
+ENABLE_START
+Verifica che le condizioni necessarie per effettuare la conversione siano rispettate
+'''
 def enableStart(*args):
     x = var1.get()
     y = var2.get()
@@ -65,7 +84,7 @@ def enableStart(*args):
         if x[:-1] == '':
             entry2.config(state='disabled')
 
-# menu left
+#Questa sezione crea gli oggetti del menu sinistro
 menu_left = Frame(root, width=150)
 menu_left_upper = Frame(menu_left, width=200, height=10)
 menu_left_middle = Frame(menu_left, width=200)
@@ -86,6 +105,8 @@ info_label2 = Label(menu_left_lower, text = '')
 entry1 = Entry(menu_left_middle, width = 15, borderwidth = 1, textvariable=var1, state = DISABLED)
 entry2 = Entry(menu_left_lower, width = 15, borderwidth = 1, textvariable=var2, state = DISABLED)
 
+
+#Questa sezione posiziona gli oggetti del menu sinistro
 space_up.pack()
 inputButton.pack()
 
@@ -100,7 +121,7 @@ menu_left_upper.pack(side="top", fill="both", expand=True)
 menu_left_middle.pack(side="top", fill="both", expand=True)
 menu_left_lower.pack(side="top", fill="both", expand=True)
 
-# right area
+#Questa sezione crea e posizoina gli oggetti della zona destra
 title_frame = Frame(root)
 
 imageNameLabel = Label(title_frame, text = "Input Image: ", pady = 25)
@@ -113,7 +134,7 @@ thumbnail_image = Canvas(thumbnail_area, width=150, height=150)
 thumbnail_image.pack()
 image_on_canvas = thumbnail_image.create_image(0, 0, anchor = NW, image = my_img)
 
-# status bar
+#Questa sezione crea e posiziona il bottone START
 status_frame = Frame(root)
 startButton = Button(status_frame, 
     text = 'Start Compression',
@@ -122,6 +143,7 @@ startButton = Button(status_frame,
     command = editImage)
 startButton.pack(fill="both", expand=True)
 
+#Questa sezione compone la GUI finale
 menu_left.grid(row=0, column=0, rowspan=2, sticky="nsew")
 title_frame.grid(row=0, column=1, sticky="ew")
 thumbnail_area.grid(row=1, column=1, sticky="nsew") 

@@ -2,6 +2,11 @@ import numpy as np
 
 from dct2 import dct2, idct2
 
+'''
+COMPRESS_MATRIX
+Input: matrice, intero f, intero d
+Questa funzione divide in blocchi la matrice, li comprime e infine li riposizona nel punto di partenza 
+'''
 def compress_matrix(mat, f, d):
     #Scarto gli avanzi della matrice
     mat = remove_margin(mat, f)
@@ -17,11 +22,21 @@ def compress_matrix(mat, f, d):
     		mat[st_x : st_x+f, st_y : st_y+f] = compress_block(block, d)
     return mat
 
+'''
+REMOVE_MARGIN
+Input: matrice, intero f
+Questa funzione rimuove i margine basso e destro della matrice che non è divisibile per f
+'''
 def remove_margin(mat, f):
 	y_margin = mat.shape[0] - (mat.shape[0] % f)
 	x_margin = mat.shape[1] - (mat.shape[1] % f)
 	return mat[:y_margin, :x_margin]
 
+'''
+COMPRESS_BLOCK
+Input: matrice, intero d
+Questa funzione comprime i singoli blocchi, taglia i valori secondo d ed inverte la compressione
+'''
 def compress_block(block, d):
     #Applico la DCT2 al Blocco
     block, t = dct2(block, False)
